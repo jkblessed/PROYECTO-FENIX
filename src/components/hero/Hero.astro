@@ -19,16 +19,18 @@ interface Props {
 const { lang, videoSrc = "/videos/pf.mp4" } = Astro.props;
 const t = useTranslations(lang);
 
-// Línea de tiempo de revelado (ms). El video respira limpio antes del texto.
+// Línea de tiempo de revelado (ms). El video respira limpio ~1.8s y luego el
+// contenido aparece con un escalonado corto (antes el CTA salía a los 3s y se
+// sentía tardío, sobre todo en móvil).
 const T = {
-  eyebrow: 2000,
-  line1: 2200,
-  line2: 2450,
-  subtitle: 2750,
-  cta: 3000,
-  cue: 3300,
+  eyebrow: 1800,
+  line1: 1950,
+  line2: 2100,
+  subtitle: 2300,
+  cta: 2450,
+  cue: 2650,
 };
-const reveal = "opacity-0 motion-safe:animate-[reveal-up_1s_var(--ease-cinematic)_forwards] motion-reduce:opacity-100";
+const reveal = "opacity-0 motion-safe:animate-[reveal-up_0.7s_var(--ease-cinematic)_forwards] motion-reduce:opacity-100";
 ---
 
 <section class="relative flex min-h-screen flex-col justify-center overflow-hidden">
