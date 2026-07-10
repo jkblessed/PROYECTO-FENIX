@@ -1,0 +1,30 @@
+---
+import { SITE } from "@config/site";
+import { localizePath, type Lang } from "@i18n/utils";
+
+/** Wordmark de marca. Enlaza a la home del idioma activo. */
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<a
+  href={localizePath("/", lang)}
+  class="group flex items-center gap-2.5"
+  aria-label={SITE.name}
+>
+  <span
+    class="grid h-8 w-8 place-items-center rounded-full border border-fenix-gold/40 text-fenix-gold transition-colors duration-300 group-hover:border-fenix-gold"
+  >
+    <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+      <path
+        d="M12 2c1.5 3 1 5-1 7 3-1 5 1 5 4a5 5 0 0 1-9 3c-2-1.5-3-4-2-7 .5 2 2 3 3 3-2-3-1-7 4-10z"
+        fill="currentColor"
+      ></path>
+    </svg>
+  </span>
+  <span class="font-display text-lg uppercase leading-none tracking-[0.12em] text-fenix-ivory">
+    Proyecto <span class="text-fenix-gold">Fénix</span>
+  </span>
+</a>

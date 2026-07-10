@@ -1,0 +1,48 @@
+---
+import "@/styles/global.css";
+import ShareCard from "@components/story/ShareCard.astro";
+import { NARRATIVE_STORIES } from "@data/stories";
+
+/**
+ * Lienzo 1080×1920 de la story card (ES) para generar la imagen compartible.
+ * Ruta técnica de render (noindex); no forma parte de la navegación.
+ */
+const lang = "es" as const;
+
+export function getStaticPaths() {
+  return NARRATIVE_STORIES.map((story) => ({
+    params: { slug: story.id },
+    props: { story },
+  }));
+}
+
+const { story } = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Share · {story.name}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #050505;
+      }
+    </style>
+  </head>
+  <body>
+    <ShareCard story={story} lang={lang} />
+  </body>
+</html>

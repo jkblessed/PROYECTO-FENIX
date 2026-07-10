@@ -1,0 +1,84 @@
+---
+import Container from "@components/ui/Container.astro";
+import Eyebrow from "@components/ui/Eyebrow.astro";
+import Button from "@components/ui/Button.astro";
+import HeroVideo from "./HeroVideo.astro";
+import ScrollCue from "./ScrollCue.astro";
+import { useTranslations, type Lang } from "@i18n/utils";
+
+/**
+ * Hero a pantalla completa: video de fondo + titular cinematográfico.
+ * Secuencia: el video corre LIMPIO ~2s y luego el contenido se revela
+ * escalonado (eyebrow → título → subtítulo → CTAs → scroll cue).
+ * El "WOW en menos de 5 segundos" del PPR vive aquí.
+ */
+interface Props {
+  lang: Lang;
+  videoSrc?: string;
+}
+const { lang, videoSrc = "/videos/pf.mp4" } = Astro.props;
+const t = useTranslations(lang);
+
+// Línea de tiempo de revelado (ms). El video respira limpio antes del texto.
+const T = {
+  eyebrow: 2000,
+  line1: 2200,
+  line2: 2450,
+  subtitle: 2750,
+  cta: 3000,
+  cue: 3300,
+};
+const reveal = "opacity-0 motion-safe:animate-[reveal-up_1s_var(--ease-cinematic)_forwards] motion-reduce:opacity-100";
+---
+
+<section class="relative flex min-h-screen flex-col justify-center overflow-hidden">
+  <HeroVideo src={videoSrc} />
+
+  <Container class="relative z-10 py-32">
+    <div class="max-w-3xl">
+      <div class={reveal} style={`animation-delay:${T.eyebrow}ms`}>
+        <Eyebrow text={t("hero.eyebrow")} />
+      </div>
+
+      <h1
+        class="mt-8 font-display text-5xl uppercase leading-[0.95] tracking-tight text-fenix-white sm:text-7xl lg:text-8xl [text-shadow:0_2px_40px_rgba(0,0,0,0.5)]"
+      >
+        <span class={`block ${reveal}`} style={`animation-delay:${T.line1}ms`}>
+          {t("hero.title.line1")}
+        </span>
+        <span class={`block text-fenix-gold ${reveal}`} style={`animation-delay:${T.line2}ms`}>
+          {t("hero.title.line2")}
+        </span>
+      </h1>
+
+      <p
+        class={`mt-8 max-w-xl text-lg leading-relaxed text-fenix-ivory/85 [text-shadow:0_1px_20px_rgba(0,0,0,0.6)] sm:text-xl ${reveal}`}
+        style={`animation-delay:${T.subtitle}ms`}
+      >
+        {t("hero.subtitle")}
+      </p>
+
+      <div
+        class={`mt-12 flex flex-col gap-4 sm:flex-row sm:items-center ${reveal}`}
+        style={`animation-delay:${T.cta}ms`}
+      >
+        <Button
+          href="https://gofund.me/badb604cd"
+          variant="gold"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t("hero.cta.primary")}
+        </Button>
+        <Button href="#mission" variant="ghost">{t("hero.cta.secondary")} →</Button>
+      </div>
+    </div>
+  </Container>
+
+  <div
+    class={`absolute inset-x-0 bottom-10 z-10 flex justify-center ${reveal}`}
+    style={`animation-delay:${T.cue}ms`}
+  >
+    <ScrollCue label={t("hero.scroll")} />
+  </div>
+</section>

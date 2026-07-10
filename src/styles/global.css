@@ -1,0 +1,251 @@
+@import "tailwindcss";
+
+/* ============================================================
+   PROYECTO FÉNIX · Sistema de diseño
+   Identidad visual oficial (PPR v1.3)
+   ============================================================ */
+@theme {
+  /* Paleta de marca */
+  --color-fenix-black: #050505;
+  --color-fenix-gray: #1a1a1a;
+  --color-fenix-ivory: #f5f2eb;
+  --color-fenix-gold: #d4af37;
+  --color-fenix-gold-soft: #e7cd7a;
+  --color-fenix-white: #ffffff;
+
+  /* Tipografía */
+  --font-display: "Anton", "Arial Narrow", sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+
+  /* Ritmo / capas */
+  --shadow-glow-gold: 0 0 60px -15px rgba(212, 175, 55, 0.45);
+
+  /* Animaciones cinematográficas */
+  --animate-reveal-up: reveal-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-fade-in: fade-in 1.2s ease forwards;
+  --animate-slow-zoom: slow-zoom 22s ease-out forwards;
+
+  /* Cinematic easing curve reutilizable */
+  --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slow-zoom {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Velo del hero: el video corre limpio y luego se atenúa para dar contraste */
+@keyframes hero-veil {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Marquee infinito horizontal */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Barrido holográfico de las cards estilo álbum */
+@keyframes holo-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-fenix-black);
+  color: var(--color-fenix-ivory);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-fenix-gold);
+  color: var(--color-fenix-black);
+}
+
+/* Scroll reveal driven by IntersectionObserver (see ScrollReveal.astro) */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(48px);
+  transition:
+    opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   Tilt 3D interactivo (cards estilo álbum de mundial)
+   Las variables --rx / --ry / --mx / --my las actualiza TiltCards.astro
+   ============================================================ */
+[data-tilt] {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 50%;
+  transform: perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+  transition: transform 0.45s var(--ease-cinematic);
+  will-change: transform;
+}
+
+[data-tilt].is-tilting {
+  transition: transform 0.08s linear;
+}
+
+/* Brillo que sigue al cursor sobre la card */
+.holo-glow {
+  background: radial-gradient(
+    420px circle at var(--mx) var(--my),
+    rgba(212, 175, 55, 0.28),
+    transparent 45%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+[data-tilt]:hover .holo-glow {
+  opacity: 1;
+}
+
+/* Barrido holográfico diagonal en hover */
+.holo-sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+[data-tilt]:hover .holo-sheen {
+  opacity: 1;
+}
+
+.holo-sheen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(245, 242, 235, 0.18) 40%,
+    rgba(231, 205, 122, 0.35) 50%,
+    transparent 60%
+  );
+  transform: translateX(-120%) skewX(-20deg);
+}
+
+[data-tilt]:hover .holo-sheen::before {
+  animation: holo-sweep 0.9s var(--ease-cinematic);
+}
+
+/* Capas que "flotan" sobre la card al inclinarse */
+.tilt-pop {
+  transform: translateZ(40px);
+}
+
+/* ============================================================
+   Marquee cinematográfico
+   ============================================================ */
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 32s linear infinite;
+}
+
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+/* Texto outline para tipografía de gran tamaño */
+.text-outline-gold {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(212, 175, 55, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  [data-tilt] {
+    transform: none !important;
+  }
+  .marquee-track {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

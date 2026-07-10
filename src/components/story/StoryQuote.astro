@@ -1,0 +1,42 @@
+---
+import Container from "@components/ui/Container.astro";
+import Reveal from "@components/effects/Reveal.astro";
+
+/**
+ * Cita a gran escala (el `hook` del jugador) en font-serif itálica dorada,
+ * centrada. Cierra el arco emocional entre los bloques narrativos.
+ */
+interface Props {
+  quote: string;
+  eyebrow?: string;
+}
+const { quote, eyebrow } = Astro.props;
+---
+
+<section class="relative overflow-hidden py-24 sm:py-36">
+  <!-- Resplandor dorado de fondo -->
+  <div
+    class="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-fenix-gold/[0.08] blur-[130px]"
+  >
+  </div>
+
+  <Container>
+    <Reveal class="relative mx-auto max-w-4xl text-center">
+      <span aria-hidden="true" class="block font-display text-7xl leading-none text-fenix-gold/30">
+        “
+      </span>
+      {
+        eyebrow && (
+          <span class="mt-2 block text-xs font-medium uppercase tracking-[0.35em] text-fenix-gold">
+            {eyebrow}
+          </span>
+        )
+      }
+      <blockquote
+        class="mt-6 font-serif text-3xl italic leading-snug text-fenix-gold-soft sm:text-5xl"
+      >
+        {quote}
+      </blockquote>
+    </Reveal>
+  </Container>
+</section>

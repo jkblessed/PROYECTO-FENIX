@@ -1,0 +1,83 @@
+---
+import Container from "@components/ui/Container.astro";
+import Logo from "@components/navbar/Logo.astro";
+import LanguageSwitcher from "@components/navbar/LanguageSwitcher.astro";
+import Footer from "@components/footer/Footer.astro";
+import RevealObserver from "@components/effects/RevealObserver.astro";
+import StoryHero from "./StoryHero.astro";
+import StoryBlock from "./StoryBlock.astro";
+import StoryQuote from "./StoryQuote.astro";
+import StoryNav from "./StoryNav.astro";
+import StoryCTA from "./StoryCTA.astro";
+import type { Story } from "@data/stories";
+import { useTranslations, localizePath, type Lang } from "@i18n/utils";
+
+/**
+ * Punto único de ensamblado de una historia inmersiva (equivalente a Landing).
+ * Compone una barra superior con marca y enlace "volver a Fénix", la portada,
+ * los tres actos narrativos (origin / talent / dream), la cita, la navegación
+ * entre historias y el cierre. Solo se invoca con historias que tienen narrativa.
+ */
+interface Props {
+  story: Story;
+  lang: Lang;
+}
+const { story, lang } = Astro.props;
+const t = useTranslations(lang);
+
+// La narrativa está garantizada por getStaticPaths (solo historias con narrative).
+const narrative = story.narrative![lang];
+const homeHref = localizePath("/", lang);
+---
+
+<!-- Barra superior: marca + volver + idioma -->
+<header class="fixed inset-x-0 top-0 z-50 bg-fenix-black/70 backdrop-blur-xl">
+  <Container class="flex items-center justify-between py-4">
+    <Logo lang={lang} />
+    <div class="flex items-center gap-6">
+      <a
+        href={homeHref}
+        class="group inline-flex items-center gap-2 text-sm tracking-wide text-fenix-ivory/75 transition-colors duration-300 hover:text-fenix-gold"
+      >
+        <span class="transition-transform duration-300 group-hover:-translate-x-1">←</span>
+        {t("story.back")}
+      </a>
+      <LanguageSwitcher lang={lang} />
+    </div>
+  </Container>
+</header>
+
+<main>
+  <StoryHero story={story} lang={lang} />
+
+  <article>
+    <StoryBlock
+      eyebrow={narrative.origin.eyebrow}
+      title={narrative.origin.title}
+      body={narrative.origin.body}
+      image={narrative.origin.image}
+      alt={narrative.origin.alt}
+    />
+    <StoryQuote quote={`“${story.hook[lang]}”`} eyebrow={t("story.quote.eyebrow")} />
+    <StoryBlock
+      eyebrow={narrative.talent.eyebrow}
+      title={narrative.talent.title}
+      body={narrative.talent.body}
+    />
+    <StoryBlock
+      eyebrow={narrative.dream.eyebrow}
+      title={narrative.dream.title}
+      body={narrative.dream.body}
+      image={narrative.dream.image}
+      alt={narrative.dream.alt}
+      reverse
+    />
+  </article>
+
+  <StoryNav storyId={story.id} lang={lang} />
+  <StoryCTA story={story} lang={lang} />
+</main>
+
+<Footer lang={lang} />
+
+<RevealObserver />

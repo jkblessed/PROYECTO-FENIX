@@ -1,0 +1,135 @@
+---
+import Section from "@components/ui/Section.astro";
+import Eyebrow from "@components/ui/Eyebrow.astro";
+import Button from "@components/ui/Button.astro";
+import Reveal from "@components/effects/Reveal.astro";
+import type { Story } from "@data/stories";
+import { useTranslations, localizePath, type Lang } from "@i18n/utils";
+
+/**
+ * Cierre de la historia: invita a sumarse al movimiento o a compartir.
+ * El título interpola el nombre del jugador desde la plantilla i18n `{name}`.
+ * "Únete" apunta al ancla #join de la home localizada; "Compartir" usa el
+ * Web Share API con fallback a copiar el enlace.
+ */
+interface Props {
+  story: Story;
+  lang: Lang;
+}
+const { story, lang } = Astro.props;
+const t = useTranslations(lang);
+const title = t("story.cta.title").replace("{name}", story.name);
+const joinHref = `${localizePath("/", lang)}#join`;
+// Imagen 9:16 lista para historia de Instagram (generada en /share/[slug]).
+const shareImage = `/images/share/${story.id}-${lang}.jpg`;
+const shareText = t("story.share.text").replace("{name}", story.name);
+const copiedLabel = t("story.share.copied");
+---
+
+<Section class="relative overflow-hidden border-t border-fenix-ivory/10 text-center">
+  <!-- Resplandor decorativo -->
+  <div
+    class="pointer-events-none absolute left-1/2 top-0 -z-0 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full bg-fenix-gold/[0.08] blur-[130px]"
+  >
+  </div>
+
+  <div class="relative mx-auto max-w-3xl">
+    <Reveal>
+      <Eyebrow text={t("story.cta.eyebrow")} class="justify-center" />
+    </Reveal>
+    <Reveal delay={100}>
+      <h2
+        class="mt-6 font-display text-4xl uppercase leading-[0.95] tracking-tight text-fenix-ivory sm:text-6xl"
+      >
+        {title}
+      </h2>
+    </Reveal>
+    <Reveal delay={150}>
+      <p class="mt-6 text-lg leading-relaxed text-fenix-ivory/70">
+        {t("story.cta.body")}
+      </p>
+    </Reveal>
+    <Reveal delay={200} class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <Button href={joinHref} variant="gold">{t("story.cta.join")}</Button>
+      <Button
+        variant="outline"
+        class="story-share"
+        data-share-title={story.name}
+        data-share-text={shareText}
+        data-share-image={shareImage}
+        data-share-slug={story.id}
+        data-copied={copiedLabel}
+      >
+        {t("story.cta.share")}
+      </Button>
+    </Reveal>
+  </div>
+</Section>
+
+<script>
+  // Comparte la story card 9:16 como archivo (para subir a una historia de
+  // Instagram desde el móvil). Si el navegador no soporta compartir archivos,
+  // comparte el enlace; y en escritorio descarga la imagen + copia el enlace.
+  async function shareStory(btn: HTMLButtonElement) {
+    const url = window.location.href;
+    const title = btn.dataset.shareTitle ?? document.title;
+    const text = btn.dataset.shareText ?? title;
+    const imgSrc = btn.dataset.shareImage;
+    const slug = btn.dataset.shareSlug ?? "proyecto-fenix";
+
+    try {
+      if (imgSrc && typeof navigator.canShare === "function") {
+        const res = await fetch(imgSrc);
+        if (!res.ok) throw new Error("share image not found");
+        const blob = await res.blob();
+        const file = new File([blob], `${slug}.jpg`, { type: blob.type || "image/jpeg" });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title, text, url });
+          return;
+        }
+      }
+      if (navigator.share) {
+        await navigator.share({ title, text, url });
+        return;
+      }
+    } catch (err) {
+      // El usuario canceló la hoja de compartir: no hacemos nada.
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      // Cualquier otro error cae al fallback de descarga.
+    }
+
+    // Fallback (escritorio / sin Web Share): descargar imagen + copiar enlace.
+    if (imgSrc) {
+      const a = document.createElement("a");
+      a.href = imgSrc;
+      a.download = `${slug}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(url);
+        const original = btn.textContent;
+        btn.textContent = btn.dataset.copied ?? original;
+        window.setTimeout(() => {
+          btn.textContent = original;
+        }, 2000);
+      } catch {
+        /* sin portapapeles: sin acción */
+      }
+    }
+  }
+
+  function initStoryShare() {
+    document.querySelectorAll<HTMLButtonElement>(".story-share").forEach((btn) => {
+      // Evita doble enganche con ClientRouter (astro:page-load + llamada directa).
+      if (btn.dataset.bound === "true") return;
+      btn.dataset.bound = "true";
+      btn.addEventListener("click", () => shareStory(btn));
+    });
+  }
+
+  initStoryShare();
+  document.addEventListener("astro:page-load", initStoryShare);
+</script>

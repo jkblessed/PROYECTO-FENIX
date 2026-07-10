@@ -1,0 +1,56 @@
+---
+import Container from "@components/ui/Container.astro";
+import { getAdjacentStories, getStoryPath } from "@data/stories";
+import { useTranslations, type Lang } from "@i18n/utils";
+
+/**
+ * Navegación entre historias (← Anterior / Siguiente →).
+ * Solo considera historias con narrativa. Robusto a un solo elemento:
+ * si no hay vecino de un lado, no renderiza esa flecha (ni la sección si no hay ninguno).
+ */
+interface Props {
+  storyId: string;
+  lang: Lang;
+}
+const { storyId, lang } = Astro.props;
+const t = useTranslations(lang);
+const { prev, next } = getAdjacentStories(storyId);
+---
+
+{
+  (prev || next) && (
+    <nav class="border-t border-fenix-ivory/10 py-14">
+      <Container class="flex items-center justify-between gap-6">
+        {prev ? (
+          <a
+            href={getStoryPath(prev.id, lang)}
+            class="group flex flex-col gap-1 text-left"
+          >
+            <span class="text-[0.7rem] uppercase tracking-[0.25em] text-fenix-ivory/50">
+              ← {t("story.prev")}
+            </span>
+            <span class="font-display text-xl uppercase tracking-wide text-fenix-ivory transition-colors duration-300 group-hover:text-fenix-gold sm:text-2xl">
+              {prev.name}
+            </span>
+          </a>
+        ) : (
+          <span />
+        )}
+
+        {next && (
+          <a
+            href={getStoryPath(next.id, lang)}
+            class="group flex flex-col gap-1 text-right"
+          >
+            <span class="text-[0.7rem] uppercase tracking-[0.25em] text-fenix-ivory/50">
+              {t("story.next")} →
+            </span>
+            <span class="font-display text-xl uppercase tracking-wide text-fenix-ivory transition-colors duration-300 group-hover:text-fenix-gold sm:text-2xl">
+              {next.name}
+            </span>
+          </a>
+        )}
+      </Container>
+    </nav>
+  )
+}

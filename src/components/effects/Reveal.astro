@@ -1,0 +1,18 @@
+---
+/**
+ * Envuelve su contenido para revelarlo al entrar en viewport.
+ * El estilo base vive en global.css (`[data-reveal]`); el observer
+ * global (RevealObserver) activa la clase `is-visible`.
+ */
+interface Props {
+  as?: keyof HTMLElementTagNameMap;
+  /** Retardo en ms para escalonar revelaciones. */
+  delay?: number;
+  class?: string;
+}
+const { as: Tag = "div", delay = 0, class: className = "" } = Astro.props;
+---
+
+<Tag data-reveal class:list={[className]} style={`--reveal-delay:${delay}ms`}>
+  <slot />
+</Tag>

@@ -1,0 +1,61 @@
+---
+import Section from "@components/ui/Section.astro";
+import Eyebrow from "@components/ui/Eyebrow.astro";
+import Reveal from "@components/effects/Reveal.astro";
+import PillarCard from "./PillarCard.astro";
+import { PILLARS } from "@data/pillars";
+import { useTranslations, type Lang } from "@i18n/utils";
+
+/**
+ * Sección "Nuestra Misión": declaración de propósito + filosofía rectora
+ * + los tres pilares Descubrir · Documentar · Construir.
+ */
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<Section id="mission" class="bg-fenix-black">
+  <div class="grid gap-16 lg:grid-cols-12 lg:gap-12">
+    <div class="lg:col-span-5">
+      <Reveal>
+        <Eyebrow text={t("mission.eyebrow")} />
+      </Reveal>
+      <Reveal delay={100}>
+        <h2
+          class="mt-8 font-display text-4xl uppercase leading-[1.05] tracking-tight text-fenix-ivory sm:text-5xl"
+        >
+          {t("mission.title")}
+        </h2>
+      </Reveal>
+    </div>
+
+    <div class="flex flex-col gap-10 lg:col-span-6 lg:col-start-7">
+      <Reveal delay={150}>
+        <p class="text-lg leading-relaxed text-fenix-ivory/70">{t("mission.body")}</p>
+      </Reveal>
+      <Reveal delay={250}>
+        <blockquote
+          class="border-l-2 border-fenix-gold pl-6 font-serif text-2xl italic leading-snug text-fenix-gold-soft sm:text-3xl"
+        >
+          “{t("mission.quote")}”
+        </blockquote>
+      </Reveal>
+    </div>
+  </div>
+
+  <div class="mt-24 grid gap-10 sm:grid-cols-3 sm:gap-8">
+    {
+      PILLARS.map((pillar, i) => (
+        <PillarCard
+          index={pillar.index}
+          title={t(pillar.titleKey)}
+          body={t(pillar.bodyKey)}
+          delay={i * 120}
+        />
+      ))
+    }
+  </div>
+</Section>

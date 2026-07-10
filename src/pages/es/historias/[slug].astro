@@ -1,0 +1,26 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import StoryArticle from "@components/story/StoryArticle.astro";
+import { NARRATIVE_STORIES } from "@data/stories";
+
+/**
+ * Páginas de historia inmersiva en español (servidas en `/es/historias`).
+ * Solo se generan las historias con narrativa (evita 404 y páginas vacías).
+ */
+const lang = "es" as const;
+
+export function getStaticPaths() {
+  return NARRATIVE_STORIES.map((story) => ({
+    params: { slug: story.id },
+    props: { story },
+  }));
+}
+
+const { story } = Astro.props;
+const title = `${story.name} · ${story.origin[lang]}`;
+const description = story.hook[lang];
+---
+
+<BaseLayout lang={lang} title={title} description={description} image={story.image}>
+  <StoryArticle story={story} lang={lang} />
+</BaseLayout>

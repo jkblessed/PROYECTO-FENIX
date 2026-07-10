@@ -1,0 +1,69 @@
+---
+import type { Story } from "@data/stories";
+import { type Lang } from "@i18n/utils";
+
+/**
+ * Portada full-screen de la historia inmersiva.
+ * Reutiliza el look dorado del cromo (foil/gold) a gran escala: foto del
+ * jugador, nombre en font-display, dorsal, sello país+bandera, edad y posición.
+ * La imagen lleva `transition:name` para el morph con el cromo del landing.
+ */
+interface Props {
+  story: Story;
+  lang: Lang;
+}
+const { story, lang } = Astro.props;
+---
+
+<header class="relative flex min-h-[92vh] items-end overflow-hidden">
+  <!-- Foto de portada (destino del morph desde la card) -->
+  <img
+    src={story.image}
+    alt={story.name}
+    fetchpriority="high"
+    decoding="async"
+    transition:name={`story-${story.id}`}
+    class="absolute inset-0 h-full w-full object-cover object-top motion-safe:animate-slow-zoom"
+  />
+
+  <!-- Scrim cinematográfico para legibilidad -->
+  <div
+    class="absolute inset-0 bg-gradient-to-t from-fenix-black via-fenix-black/55 to-fenix-black/20"
+  >
+  </div>
+  <div class="absolute inset-0 bg-gradient-to-r from-fenix-black/60 to-transparent"></div>
+
+  <!-- Marca de agua: dorsal gigante -->
+  <span
+    aria-hidden="true"
+    class="pointer-events-none absolute -right-6 bottom-0 font-display text-[22rem] leading-[0.7] text-fenix-white/[0.05] sm:text-[30rem]"
+  >
+    {story.number}
+  </span>
+
+  <!-- Identidad del jugador -->
+  <div class="relative mx-auto w-full max-w-7xl px-6 pb-16 sm:px-8 sm:pb-24 lg:px-12">
+    <div class="flex flex-wrap items-center gap-3">
+      <span
+        class="inline-flex items-center gap-2 rounded-full border border-fenix-gold/40 bg-fenix-black/60 px-4 py-1.5 text-xs font-semibold tracking-widest text-fenix-ivory backdrop-blur-md"
+      >
+        <span class="text-base leading-none">{story.flag}</span>
+        {story.country}
+      </span>
+      <span
+        class="inline-flex items-center rounded-full bg-fenix-gold/15 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-fenix-gold ring-1 ring-inset ring-fenix-gold/30"
+      >
+        #{story.number} · {story.position[lang]}
+      </span>
+      <span class="text-[0.7rem] uppercase tracking-[0.25em] text-fenix-ivory/60">
+        {story.origin[lang]} · {story.age}
+      </span>
+    </div>
+
+    <h1
+      class="mt-6 max-w-4xl font-display text-6xl uppercase leading-[0.9] tracking-wide text-fenix-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)] sm:text-8xl lg:text-9xl"
+    >
+      {story.name}
+    </h1>
+  </div>
+</header>

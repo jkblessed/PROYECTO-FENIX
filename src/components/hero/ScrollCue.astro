@@ -1,0 +1,31 @@
+---
+/** Indicador animado "desliza" al pie del hero. */
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+
+<a
+  href="#mission"
+  class="group flex flex-col items-center gap-3 text-fenix-ivory/60 transition-colors duration-300 hover:text-fenix-gold"
+  aria-label={label}
+>
+  <span class="text-[0.65rem] uppercase tracking-[0.3em]">{label}</span>
+  <span class="relative h-10 w-px overflow-hidden bg-fenix-ivory/20">
+    <span
+      class="absolute inset-x-0 top-0 h-1/2 bg-fenix-gold motion-safe:animate-[scroll-cue_1.8s_ease-in-out_infinite]"
+    ></span>
+  </span>
+</a>
+
+<style>
+  @keyframes scroll-cue {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(200%);
+    }
+  }
+</style>

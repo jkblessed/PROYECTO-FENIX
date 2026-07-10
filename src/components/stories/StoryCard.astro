@@ -1,0 +1,129 @@
+---
+import Reveal from "@components/effects/Reveal.astro";
+import { getStoryPath, type Story } from "@data/stories";
+import { useTranslations, type Lang } from "@i18n/utils";
+
+/**
+ * Tarjeta de historia estilo cromo de álbum de mundial (Panini):
+ * marco dorado de foil, dorsal, sello de país con bandera, barrido
+ * holográfico y tilt 3D que sigue al cursor (data-tilt → TiltCards.astro).
+ * La variante `featured` ocupa 2×2 en el grid.
+ */
+interface Props {
+  story: Story;
+  lang: Lang;
+  delay?: number;
+}
+const { story, lang, delay = 0 } = Astro.props;
+const t = useTranslations(lang);
+
+// Si la historia tiene narrativa, enlaza a su página; si no, mantiene el ancla.
+const href = story.narrative ? getStoryPath(story.id, lang) : "#stories";
+---
+
+<Reveal
+  delay={delay}
+  class:list={["h-full", story.featured ? "sm:col-span-2 sm:row-span-2" : ""]}
+>
+  <article data-tilt class="group relative h-full">
+    <!-- Marco dorado de foil -->
+    <div
+      class="relative h-full rounded-[1.25rem] bg-gradient-to-br from-fenix-gold via-fenix-gold-soft to-fenix-gold/30 p-[1.5px] shadow-[0_10px_40px_-20px_rgba(0,0,0,0.9)] transition-all duration-500 group-hover:from-fenix-gold-soft group-hover:to-fenix-gold/60 group-hover:shadow-glow-gold"
+    >
+      <a
+        href={href}
+        class:list={[
+          "relative block h-full overflow-hidden rounded-[1.2rem] bg-fenix-gray",
+          story.featured ? "min-h-[24rem] sm:min-h-[34rem]" : "min-h-[22rem]",
+        ]}
+      >
+        <!-- Foto del jugador -->
+        <img
+          src={story.image}
+          alt={story.name}
+          loading="lazy"
+          decoding="async"
+          transition:name={story.narrative ? `story-${story.id}` : undefined}
+          class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-[1.2s] ease-out group-hover:scale-110"
+        />
+        <!-- Scrim para legibilidad -->
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-fenix-black via-fenix-black/35 to-fenix-black/10"
+        >
+        </div>
+
+        <!-- Capas holográficas -->
+        <div class="holo-glow absolute inset-0 mix-blend-screen"></div>
+        <div class="holo-sheen"></div>
+
+        <!-- Marca de agua: número gigante de fondo -->
+        <span
+          aria-hidden="true"
+          class="pointer-events-none absolute -bottom-6 -right-2 font-display text-[9rem] leading-none text-fenix-white/[0.04] transition-colors duration-500 group-hover:text-fenix-gold/10"
+        >
+          {story.number}
+        </span>
+
+        <!-- Cabecera: sello de país + dorsal -->
+        <div class="tilt-pop absolute inset-x-4 top-4 flex items-start justify-between">
+          <span
+            class="inline-flex items-center gap-2 rounded-full border border-fenix-gold/30 bg-fenix-black/60 px-3 py-1.5 text-xs font-semibold tracking-widest text-fenix-ivory backdrop-blur-md"
+          >
+            <span class="text-base leading-none">{story.flag}</span>
+            {story.country}
+          </span>
+          <span class="flex flex-col items-center leading-none">
+            <span class="font-display text-4xl text-fenix-gold drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] sm:text-5xl">
+              {story.number}
+            </span>
+          </span>
+        </div>
+
+        <!-- Pie: identidad del jugador -->
+        <div class="tilt-pop absolute inset-x-0 bottom-0 p-5 sm:p-6">
+          <span
+            class="inline-block rounded-full bg-fenix-gold/15 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-fenix-gold ring-1 ring-inset ring-fenix-gold/30"
+          >
+            {story.position[lang]}
+          </span>
+          <p class="mt-3 text-[0.7rem] uppercase tracking-[0.25em] text-fenix-ivory/55">
+            {story.origin[lang]} · {story.age}
+          </p>
+          <h3
+            class:list={[
+              "mt-1 font-display uppercase leading-[0.95] tracking-wide text-fenix-white",
+              story.featured ? "text-3xl sm:text-5xl" : "text-2xl",
+            ]}
+          >
+            {story.name}
+          </h3>
+
+          <!-- Gancho narrativo: siempre visible en la destacada, en hover en las demás -->
+          <div
+            class:list={[
+              "grid overflow-hidden transition-all duration-500 ease-out group-hover:grid-rows-[1fr]",
+              story.featured ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+            ]}
+          >
+            <div class="min-h-0">
+              <p
+                class:list={[
+                  "mt-3 max-w-md font-serif italic leading-snug text-fenix-ivory/85",
+                  story.featured ? "text-lg sm:text-xl" : "text-sm",
+                ]}
+              >
+                “{story.hook[lang]}”
+              </p>
+              <span
+                class="mt-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-fenix-gold"
+              >
+                {t("stories.card.read")}
+                <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </article>
+</Reveal>

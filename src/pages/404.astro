@@ -1,0 +1,39 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Button from "@components/ui/Button.astro";
+import { ui } from "@i18n/ui";
+import { useTranslations, localizePath } from "@i18n/utils";
+
+/**
+ * Página 404 de marca. Astro sirve una sola 404 para todo el sitio, así que se
+ * muestra en el idioma por defecto (EN) con una línea secundaria en español.
+ */
+const lang = "en" as const;
+const t = useTranslations(lang);
+---
+
+<BaseLayout lang={lang} title={t("notfound.title")}>
+  <main
+    class="grid min-h-screen place-items-center overflow-hidden bg-fenix-black px-6 text-center"
+  >
+    <div class="relative">
+      <div
+        class="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-fenix-gold/[0.08] blur-[130px]"
+      >
+      </div>
+      <p class="font-display text-[9rem] leading-none text-fenix-gold sm:text-[12rem]">404</p>
+      <h1
+        class="mt-4 font-display text-3xl uppercase tracking-tight text-fenix-ivory sm:text-4xl"
+      >
+        {t("notfound.title")}
+      </h1>
+      <p class="mx-auto mt-4 max-w-md text-lg text-fenix-ivory/70">{t("notfound.body")}</p>
+      <p class="mx-auto mt-1 max-w-md text-sm italic text-fenix-ivory/45">
+        {ui.es["notfound.body"]}
+      </p>
+      <div class="mt-10 flex items-center justify-center">
+        <Button href={localizePath("/", lang)} variant="gold">{t("notfound.cta")}</Button>
+      </div>
+    </div>
+  </main>
+</BaseLayout>

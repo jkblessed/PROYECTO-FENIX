@@ -1,0 +1,26 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import StoryArticle from "@components/story/StoryArticle.astro";
+import { NARRATIVE_STORIES } from "@data/stories";
+
+/**
+ * Immersive story pages in English (default locale, served under /stories).
+ * Only stories with narrative are generated (avoids 404s and empty pages).
+ */
+const lang = "en" as const;
+
+export function getStaticPaths() {
+  return NARRATIVE_STORIES.map((story) => ({
+    params: { slug: story.id },
+    props: { story },
+  }));
+}
+
+const { story } = Astro.props;
+const title = `${story.name} · ${story.origin[lang]}`;
+const description = story.hook[lang];
+---
+
+<BaseLayout lang={lang} title={title} description={description} image={story.image}>
+  <StoryArticle story={story} lang={lang} />
+</BaseLayout>

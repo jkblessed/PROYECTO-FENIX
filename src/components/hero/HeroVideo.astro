@@ -1,0 +1,90 @@
+---
+/**
+ * Capa de video de fondo del hero, a pantalla completa.
+ * El video se reproduce UNA sola vez (sin loop) y al terminar se DESVANECE,
+ * dejando el fondo oscuro de Fénix (negro + resplandor dorado del velo), no el
+ * último frame. Vuelve a reproducirse en cada carga o navegación.
+ * autoplay + muted + playsinline para autoplay silencioso en móvil.
+ */
+interface Props {
+  src: string;
+}
+const { src } = Astro.props;
+---
+
+<div class="absolute inset-0 -z-10 overflow-hidden bg-fenix-black">
+  <video
+    id="hero-video"
+    class="absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-out motion-safe:animate-[slow-zoom_22s_ease-out_forwards]"
+    autoplay
+    muted
+    playsinline
+    preload="auto"
+    aria-hidden="true"
+  >
+    <source src={src} type="video/mp4" />
+  </video>
+
+  <!-- Velo cinematográfico: invisible al inicio, se atenúa al aparecer el texto. -->
+  <div
+    class="absolute inset-0 opacity-0 motion-safe:animate-[hero-veil_1.6s_ease_1.6s_forwards] motion-reduce:opacity-100"
+  >
+    <!-- Oscurecimiento general (suave, deja ver el video) -->
+    <div class="absolute inset-0 bg-fenix-black/30"></div>
+    <!-- Anclaje inferior para legibilidad del titular -->
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-fenix-black via-fenix-black/25 to-transparent"
+    >
+    </div>
+    <!-- Tinte dorado sutil en una esquina -->
+    <div
+      class="absolute -right-40 top-1/4 h-[40rem] w-[40rem] rounded-full bg-fenix-gold/10 blur-[120px]"
+    >
+    </div>
+  </div>
+</div>
+
+<script>
+  // Reproduce el video desde el inicio en cada carga Y en cada navegación con
+  // ClientRouter (View Transitions no dispara `autoplay` de forma fiable en el
+  // elemento reinsertado — por eso quedaba "paralizado" al cambiar de idioma).
+  // Al terminar, se desvanece dejando el fondo oscuro de Fénix (no el frame final).
+  function initHeroVideo() {
+    const video = document.getElementById("hero-video") as HTMLVideoElement | null;
+    if (!video) return;
+
+    // CLAVE: al reinsertar el <video> con ClientRouter, el ATRIBUTO `muted` no
+    // se refleja en la PROPIEDAD, y el navegador bloquea el autoplay silencioso
+    // ("play() can only be initiated by a user gesture"). Forzarlo por JS lo
+    // vuelve a permitir. Igual con playsInline para móvil.
+    video.muted = true;
+    video.playsInline = true;
+    // La opacidad va por ESTILO INLINE (gana sobre las clases de Tailwind:
+    // `opacity-100` se definía después que `opacity-0` y no dejaba ocultarlo).
+    video.style.opacity = "1";
+    const start = () => {
+      try {
+        video.currentTime = 0;
+      } catch {
+        /* metadata aún no lista: play() igual arranca desde 0 */
+      }
+      video.play().catch(() => {
+        /* si aun así se bloquea, queda el fondo oscuro de Fénix */
+      });
+    };
+    if (video.readyState >= 1) start();
+    else video.addEventListener("loadedmetadata", start, { once: true });
+
+    // Al terminar, se desvanece (opacidad 0) dejando el fondo oscuro de Fénix.
+    // Listener una sola vez por elemento (guarda).
+    if (video.dataset.bound !== "true") {
+      video.dataset.bound = "true";
+      video.addEventListener("ended", () => {
+        video.style.opacity = "0";
+      });
+    }
+  }
+
+  initHeroVideo();
+  document.addEventListener("astro:page-load", initHeroVideo);
+</script>

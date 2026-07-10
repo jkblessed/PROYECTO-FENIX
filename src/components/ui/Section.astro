@@ -1,0 +1,26 @@
+---
+import Container from "./Container.astro";
+
+/**
+ * Sección de página con id de anclaje, padding vertical generoso
+ * y contenedor interno opcional.
+ */
+interface Props {
+  id?: string;
+  class?: string;
+  contained?: boolean;
+}
+const { id, class: className = "", contained = true } = Astro.props;
+---
+
+<section id={id} class:list={["relative py-24 sm:py-32 lg:py-40", className]}>
+  {
+    contained ? (
+      <Container>
+        <slot />
+      </Container>
+    ) : (
+      <slot />
+    )
+  }
+</section>

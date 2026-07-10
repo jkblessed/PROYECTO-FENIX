@@ -1,0 +1,74 @@
+---
+import Section from "@components/ui/Section.astro";
+import Eyebrow from "@components/ui/Eyebrow.astro";
+import Button from "@components/ui/Button.astro";
+import Reveal from "@components/effects/Reveal.astro";
+import StoryCard from "./StoryCard.astro";
+import ComingSoonCard from "./ComingSoonCard.astro";
+import { VISIBLE_STORIES, NARRATIVE_STORIES, UPCOMING } from "@data/stories";
+import { useTranslations, type Lang } from "@i18n/utils";
+
+/**
+ * Sección "Historias": colección editorial de cromos de jugadores
+ * estilo álbum de mundial, con una historia destacada (2×2).
+ */
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+// Contador de colección: historias publicadas (con página propia).
+const total = String(NARRATIVE_STORIES.length).padStart(2, "0");
+---
+
+<Section id="stories" class="relative overflow-hidden bg-fenix-gray/20">
+  <!-- Resplandor decorativo de fondo -->
+  <div
+    class="pointer-events-none absolute -left-32 top-1/3 -z-0 h-[30rem] w-[30rem] rounded-full bg-fenix-gold/[0.07] blur-[130px]"
+  >
+  </div>
+
+  <div class="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+    <div class="max-w-2xl">
+      <Reveal>
+        <Eyebrow text={t("stories.eyebrow")} />
+      </Reveal>
+      <Reveal delay={100}>
+        <h2
+          class="mt-6 font-display text-5xl uppercase leading-[0.95] tracking-tight text-fenix-ivory sm:text-7xl"
+        >
+          {t("stories.title")}
+        </h2>
+      </Reveal>
+      <Reveal delay={150}>
+        <p class="mt-5 max-w-xl text-lg leading-relaxed text-fenix-ivory/70">
+          {t("stories.body")}
+        </p>
+      </Reveal>
+    </div>
+
+    <Reveal delay={200} class="flex shrink-0 items-end gap-6">
+      <!-- Contador de colección, estilo álbum -->
+      <div class="hidden font-display leading-none text-fenix-ivory/30 sm:block">
+        <span class="text-5xl text-fenix-gold">{total}</span>
+        <span class="text-3xl">/∞</span>
+      </div>
+      {
+        NARRATIVE_STORIES.length > 1 && (
+          <Button href="#stories" variant="outline">
+            {t("stories.cta")}
+          </Button>
+        )
+      }
+    </Reveal>
+  </div>
+
+  <div class="relative mt-16 grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {UPCOMING.map((story, i) => <ComingSoonCard story={story} lang={lang} delay={i * 100} />)}
+    {
+      VISIBLE_STORIES.map((story, i) => (
+        <StoryCard story={story} lang={lang} delay={(UPCOMING.length + i) * 100} />
+      ))
+    }
+  </div>
+</Section>

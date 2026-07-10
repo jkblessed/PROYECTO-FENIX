@@ -1,0 +1,123 @@
+---
+import Container from "@components/ui/Container.astro";
+import Button from "@components/ui/Button.astro";
+import Logo from "./Logo.astro";
+import NavLinks from "./NavLinks.astro";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+import { useTranslations, type Lang } from "@i18n/utils";
+
+/**
+ * Barra de navegación fija. Transparente sobre el hero; al hacer scroll
+ * adquiere fondo translúcido con blur (gestionado por script ligero).
+ * Incluye menú móvil accesible.
+ */
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<header
+  id="site-header"
+  class="fixed inset-x-0 top-0 z-50 opacity-0 transition-all duration-500 motion-safe:animate-[fade-in_1s_ease_2s_forwards] motion-reduce:opacity-100"
+  data-scrolled="false"
+>
+  <Container class="flex items-center justify-between py-5">
+    <Logo lang={lang} />
+
+    <!-- Navegación de escritorio -->
+    <nav class="hidden items-center gap-10 lg:flex" aria-label="Principal">
+      <NavLinks lang={lang} class="flex items-center gap-9" />
+    </nav>
+
+    <div class="hidden items-center gap-6 lg:flex">
+      <LanguageSwitcher lang={lang} />
+      <Button href="#join" variant="outline" class="!px-5 !py-2.5 text-xs">
+        {t("nav.join")}
+      </Button>
+    </div>
+
+    <!-- Botón de menú móvil -->
+    <button
+      id="menu-toggle"
+      class="flex flex-col gap-1.5 lg:hidden"
+      aria-label={t("nav.menu")}
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span class="h-px w-7 bg-fenix-ivory transition-all duration-300"></span>
+      <span class="h-px w-7 bg-fenix-ivory transition-all duration-300"></span>
+    </button>
+  </Container>
+
+  <!-- Menú móvil -->
+  <div
+    id="mobile-menu"
+    class="invisible absolute inset-x-0 top-full origin-top -translate-y-2 scale-y-95 border-b border-fenix-gold/10 bg-fenix-black/95 opacity-0 backdrop-blur-xl transition-all duration-300 lg:hidden"
+  >
+    <Container class="flex flex-col gap-6 py-8">
+      <NavLinks lang={lang} class="flex flex-col gap-5 text-lg" />
+      <div class="flex items-center justify-between border-t border-fenix-ivory/10 pt-6">
+        <LanguageSwitcher lang={lang} />
+        <Button href="#join" variant="gold" class="!px-5 !py-2.5 text-xs">
+          {t("nav.join")}
+        </Button>
+      </div>
+    </Container>
+  </div>
+</header>
+
+<script>
+  // Aplica el fondo translúcido al hacer scroll. Consulta el header actual cada
+  // vez (con ClientRouter el #site-header se reemplaza en cada navegación).
+  function applyScrollState() {
+    const header = document.getElementById("site-header");
+    if (!header) return;
+    const scrolled = window.scrollY > 24;
+    header.dataset.scrolled = String(scrolled);
+    header.classList.toggle("bg-fenix-black/80", scrolled);
+    header.classList.toggle("backdrop-blur-xl", scrolled);
+    header.classList.toggle("border-b", scrolled);
+    header.classList.toggle("border-fenix-gold/10", scrolled);
+    header.classList.toggle("py-0", scrolled);
+  }
+
+  function initHeader() {
+    const header = document.getElementById("site-header");
+    const toggle = document.getElementById("menu-toggle");
+    const menu = document.getElementById("mobile-menu");
+    if (!header) return;
+    applyScrollState();
+
+    // Menú móvil (guarda por-header: evita doble enganche con astro:page-load).
+    if (toggle && menu && header.dataset.bound !== "true") {
+      header.dataset.bound = "true";
+      const close = () => {
+        toggle.setAttribute("aria-expanded", "false");
+        menu.classList.add("invisible", "opacity-0", "-translate-y-2", "scale-y-95");
+      };
+      toggle.addEventListener("click", () => {
+        const open = toggle.getAttribute("aria-expanded") === "true";
+        if (open) {
+          close();
+        } else {
+          toggle.setAttribute("aria-expanded", "true");
+          menu.classList.remove("invisible", "opacity-0", "-translate-y-2", "scale-y-95");
+        }
+      });
+      menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
+    }
+  }
+
+  // El listener de scroll se engancha UNA sola vez a `window` (persiste entre
+  // navegaciones de ClientRouter, así que no debe re-añadirse: evita la fuga).
+  const w = window as Window & { __fenixScrollBound?: boolean };
+  if (!w.__fenixScrollBound) {
+    w.__fenixScrollBound = true;
+    window.addEventListener("scroll", applyScrollState, { passive: true });
+  }
+
+  initHeader();
+  document.addEventListener("astro:page-load", initHeader);
+</script>

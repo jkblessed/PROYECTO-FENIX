@@ -1,0 +1,72 @@
+---
+import Reveal from "@components/effects/Reveal.astro";
+import type { UpcomingStory } from "@data/stories";
+import { useTranslations, type Lang } from "@i18n/utils";
+
+/**
+ * Card destacada "Coming Soon" para una historia en proceso.
+ * Reutiliza el look de cromo (foil dorado + tilt) pero SIN dorsal, posición,
+ * cita ni enlace: solo foto, sello de país, nombre, origen y la etiqueta.
+ * Ocupa el lugar grande del grid (2×2) mientras se prepara el reportaje.
+ */
+interface Props {
+  story: UpcomingStory;
+  lang: Lang;
+  delay?: number;
+}
+const { story, lang, delay = 0 } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<Reveal delay={delay} class="h-full sm:col-span-2 sm:row-span-2">
+  <article data-tilt class="group relative h-full">
+    <!-- Marco dorado de foil -->
+    <div
+      class="relative h-full rounded-[1.25rem] bg-gradient-to-br from-fenix-gold via-fenix-gold-soft to-fenix-gold/30 p-[1.5px] shadow-[0_10px_40px_-20px_rgba(0,0,0,0.9)] transition-all duration-500 group-hover:shadow-glow-gold"
+    >
+      <div
+        class="relative block h-full min-h-[24rem] overflow-hidden rounded-[1.2rem] bg-fenix-gray sm:min-h-[34rem]"
+      >
+        <img
+          src={story.image}
+          alt={story.name}
+          loading="lazy"
+          decoding="async"
+          class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-[1.2s] ease-out group-hover:scale-105"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-fenix-black via-fenix-black/35 to-fenix-black/10"
+        >
+        </div>
+        <div class="holo-glow absolute inset-0 mix-blend-screen"></div>
+
+        <!-- Cabecera: sello de país + etiqueta Coming Soon -->
+        <div class="tilt-pop absolute inset-x-4 top-4 flex items-start justify-between">
+          <span
+            class="inline-flex items-center gap-2 rounded-full border border-fenix-gold/30 bg-fenix-black/60 px-3 py-1.5 text-xs font-semibold tracking-widest text-fenix-ivory backdrop-blur-md"
+          >
+            <span class="text-base leading-none">{story.flag}</span>
+            {story.country}
+          </span>
+          <span
+            class="inline-flex items-center rounded-full bg-fenix-gold px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-fenix-black"
+          >
+            {t("card.comingsoon")}
+          </span>
+        </div>
+
+        <!-- Pie: origen + nombre -->
+        <div class="tilt-pop absolute inset-x-0 bottom-0 p-5 sm:p-6">
+          <p class="text-[0.7rem] uppercase tracking-[0.25em] text-fenix-ivory/55">
+            {story.origin[lang]}
+          </p>
+          <h3
+            class="mt-1 font-display text-3xl uppercase leading-[0.95] tracking-wide text-fenix-white sm:text-5xl"
+          >
+            {story.name}
+          </h3>
+        </div>
+      </div>
+    </div>
+  </article>
+</Reveal>

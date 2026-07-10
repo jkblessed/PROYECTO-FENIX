@@ -1,0 +1,38 @@
+---
+import { MARQUEE_WORDS } from "@data/marquee";
+import type { Lang } from "@i18n/utils";
+
+/**
+ * Banda de texto en marquee infinito. Alterna palabras sólidas y con
+ * contorno dorado para dar ritmo cinematográfico entre secciones.
+ */
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const words = MARQUEE_WORDS[lang];
+// Duplicamos la secuencia para un bucle continuo sin saltos.
+const loop = [...words, ...words];
+---
+
+<div
+  class="marquee-mask relative overflow-hidden border-y border-fenix-gold/15 bg-fenix-black py-8 sm:py-10"
+>
+  <div class="marquee-track">
+    {
+      loop.map((word, i) => (
+        <span class="flex items-center">
+          <span
+            class:list={[
+              "px-8 font-display text-5xl uppercase tracking-tight sm:text-7xl",
+              i % 2 === 0 ? "text-fenix-ivory/90" : "text-outline-gold",
+            ]}
+          >
+            {word}
+          </span>
+          <span class="text-2xl text-fenix-gold sm:text-3xl">✦</span>
+        </span>
+      ))
+    }
+  </div>
+</div>

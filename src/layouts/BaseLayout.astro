@@ -1,0 +1,125 @@
+---
+import "@/styles/global.css";
+import { ClientRouter } from "astro:transitions";
+import { SITE } from "@config/site";
+import { type Lang } from "@i18n/utils";
+import { alternateLangPath } from "@data/stories";
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  /** Imagen social (og:image / twitter:image), relativa o absoluta. */
+  image?: string;
+}
+
+const { lang, title, description, image } = Astro.props;
+
+const pageTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} · ${SITE.tagline[lang]}`;
+const pageDescription = description ?? SITE.tagline[lang];
+
+// URLs absolutas para SEO / redes (canonical, hreflang, Open Graph).
+const path = Astro.url.pathname;
+const canonical = new URL(path, SITE.url).href;
+const esUrl = new URL(alternateLangPath(path, "es"), SITE.url).href;
+const enUrl = new URL(alternateLangPath(path, "en"), SITE.url).href;
+const ogImage = image ? new URL(image, SITE.url).href : undefined;
+---
+
+<!doctype html>
+<html lang={lang} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!--
+      Anti-salto al recargar: desactivamos la restauración de scroll del navegador.
+      En una recarga limpiamos el ancla (#stories, #join…) para arrancar en el hero;
+      un deep-link con ancla se respeta, pero tras cargar imágenes (evita el salto brusco).
+    -->
+    <script is:inline>
+      (function () {
+        if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+        var nav = performance.getEntriesByType("navigation")[0];
+        var isReload = nav && nav.type === "reload";
+        if (isReload && location.hash) {
+          history.replaceState(null, "", location.pathname + location.search);
+        }
+        if (isReload) {
+          window.addEventListener(
+            "DOMContentLoaded",
+            function () {
+              window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+            },
+            { once: true }
+          );
+        } else if (location.hash) {
+          window.addEventListener(
+            "load",
+            function () {
+              try {
+                var el = document.querySelector(location.hash);
+                if (el) el.scrollIntoView();
+              } catch (e) {}
+            },
+            { once: true }
+          );
+        }
+      })();
+    </script>
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+
+    <!-- Canonical + versiones por idioma (hreflang) -->
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={esUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={esUrl} />
+
+    <!-- View Transitions: morph entre cromo y portada de historia (SPA-like). -->
+    <ClientRouter />
+
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={lang === "es" ? "es_ES" : "en_US"} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    <meta name="theme-color" content="#050505" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Sin JS: el contenido revelado por scroll permanece visible. -->
+    <noscript>
+      <style>
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
+    </noscript>
+
+    <!-- Tipografía de marca -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

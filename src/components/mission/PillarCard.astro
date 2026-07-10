@@ -1,0 +1,39 @@
+---
+import Reveal from "@components/effects/Reveal.astro";
+
+/** Tarjeta de un pilar de la filosofía (Descubrir / Documentar / Construir). */
+interface Props {
+  index: string;
+  title: string;
+  body: string;
+  delay?: number;
+}
+const { index, title, body, delay = 0 } = Astro.props;
+---
+
+<Reveal delay={delay} class="h-full">
+  <div
+    class="group relative h-full overflow-hidden rounded-xl border border-fenix-ivory/10 bg-fenix-gray/20 p-7 transition-all duration-500 hover:-translate-y-1.5 hover:border-fenix-gold/40 hover:bg-fenix-gray/40 hover:shadow-[0_20px_50px_-30px_rgba(212,175,55,0.6)]"
+  >
+    <!-- Resplandor superior que aparece en hover -->
+    <span
+      class="absolute inset-x-0 top-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-fenix-gold to-transparent transition-transform duration-500 group-hover:scale-x-100"
+    ></span>
+
+    <div class="flex items-baseline justify-between">
+      <span
+        class="font-display text-3xl text-fenix-gold/40 transition-all duration-500 group-hover:text-fenix-gold"
+      >
+        {index}
+      </span>
+      <span
+        class="text-fenix-gold opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-100 -translate-x-2"
+      >
+        →
+      </span>
+    </div>
+
+    <h3 class="mt-6 font-display text-2xl uppercase tracking-wide text-fenix-ivory">{title}</h3>
+    <p class="mt-3 text-sm leading-relaxed text-fenix-ivory/60">{body}</p>
+  </div>
+</Reveal>

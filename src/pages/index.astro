@@ -1,0 +1,11 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Landing from "@components/Landing.astro";
+
+// English landing page (default locale, served at root `/`).
+const lang = "en" as const;
+---
+
+<BaseLayout lang={lang}>
+  <Landing lang={lang} />
+</BaseLayout>

@@ -1,0 +1,32 @@
+---
+/**
+ * Botón / enlace polimórfico de marca.
+ * `variant`: gold (sólido), outline (borde oro), ghost (texto).
+ */
+interface Props {
+  href?: string;
+  variant?: "gold" | "outline" | "ghost";
+  type?: "button" | "submit";
+  class?: string;
+  [key: string]: unknown;
+}
+// `...rest` reenvía atributos extra (target, rel, data-*, aria-*) al elemento.
+const { href, variant = "gold", type = "button", class: className = "", ...rest } = Astro.props;
+
+const base =
+  "group inline-flex items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-sm font-medium tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fenix-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-fenix-black";
+
+const variants = {
+  gold: "bg-fenix-gold text-fenix-black hover:bg-fenix-gold-soft hover:shadow-glow-gold",
+  outline:
+    "border border-fenix-gold/50 text-fenix-ivory hover:border-fenix-gold hover:bg-fenix-gold/10",
+  ghost: "text-fenix-ivory/80 hover:text-fenix-gold",
+};
+
+const classes = [base, variants[variant], className];
+const Tag = href ? "a" : "button";
+---
+
+<Tag class:list={classes} href={href} type={href ? undefined : type} {...rest}>
+  <slot />
+</Tag>

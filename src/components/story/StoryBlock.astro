@@ -1,0 +1,71 @@
+---
+import Container from "@components/ui/Container.astro";
+import Eyebrow from "@components/ui/Eyebrow.astro";
+import Reveal from "@components/effects/Reveal.astro";
+
+/**
+ * Bloque narrativo genérico y reutilizable (origin / talent / dream).
+ * Recibe eyebrow opcional, título y cuerpo; opcionalmente una imagen que
+ * alterna de lado con `reverse`. Todo se revela al entrar en viewport.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  body: string;
+  image?: string;
+  alt?: string;
+  reverse?: boolean;
+}
+const { eyebrow, title, body, image, alt = "", reverse = false } = Astro.props;
+---
+
+<section class="relative py-20 sm:py-28">
+  <Container>
+    <div
+      class:list={[
+        "grid items-center gap-10 lg:gap-16",
+        image ? "lg:grid-cols-2" : "lg:grid-cols-1",
+      ]}
+    >
+      <!-- Texto -->
+      <div class:list={[image && reverse ? "lg:order-2" : ""]}>
+        {
+          eyebrow && (
+            <Reveal>
+              <Eyebrow text={eyebrow} />
+            </Reveal>
+          )
+        }
+        <Reveal delay={100}>
+          <h2
+            class="mt-6 font-display text-4xl uppercase leading-[0.95] tracking-tight text-fenix-ivory sm:text-6xl"
+          >
+            {title}
+          </h2>
+        </Reveal>
+        <Reveal delay={150}>
+          <p class="mt-6 max-w-xl text-lg leading-relaxed text-fenix-ivory/75">
+            {body}
+          </p>
+        </Reveal>
+      </div>
+
+      <!-- Imagen opcional del bloque -->
+      {
+        image && (
+          <Reveal delay={200} class:list={[reverse ? "lg:order-1" : ""]}>
+            <div class="relative overflow-hidden rounded-[1.25rem] bg-gradient-to-br from-fenix-gold via-fenix-gold-soft to-fenix-gold/30 p-[1.5px] shadow-[0_20px_60px_-30px_rgba(0,0,0,0.9)]">
+              <img
+                src={image}
+                alt={alt}
+                loading="lazy"
+                decoding="async"
+                class="aspect-[3/4] w-full rounded-[1.2rem] object-cover"
+              />
+            </div>
+          </Reveal>
+        )
+      }
+    </div>
+  </Container>
+</section>

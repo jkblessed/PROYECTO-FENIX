@@ -1,0 +1,26 @@
+---
+import { SOCIALS } from "@config/site";
+
+/** Lista de enlaces a redes sociales, derivada de la config. */
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<ul class:list={["flex flex-wrap gap-x-6 gap-y-2", className]}>
+  {
+    SOCIALS.map((social) => (
+      <li>
+        <a
+          href={social.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm text-fenix-ivory/60 transition-colors duration-300 hover:text-fenix-gold"
+        >
+          {social.label}
+        </a>
+      </li>
+    ))
+  }
+</ul>
