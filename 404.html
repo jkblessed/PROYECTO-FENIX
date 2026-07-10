@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Astro v5.18.2"><!--
+      Anti-salto al recargar: desactivamos la restauración de scroll del navegador.
+      En una recarga limpiamos el ancla (#stories, #join…) para arrancar en el hero;
+      un deep-link con ancla se respeta, pero tras cargar imágenes (evita el salto brusco).
+    --><script>
+      (function () {
+        if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+        var nav = performance.getEntriesByType("navigation")[0];
+        var isReload = nav && nav.type === "reload";
+        if (isReload && location.hash) {
+          history.replaceState(null, "", location.pathname + location.search);
+        }
+        if (isReload) {
+          window.addEventListener(
+            "DOMContentLoaded",
+            function () {
+              window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+            },
+            { once: true }
+          );
+        } else if (location.hash) {
+          window.addEventListener(
+            "load",
+            function () {
+              try {
+                var el = document.querySelector(location.hash);
+                if (el) el.scrollIntoView();
+              } catch (e) {}
+            },
+            { once: true }
+          );
+        }
+      })();
+    </script><title>Page not found · Proyecto Fénix</title><meta name="description" content="We build futures. We tell real stories."><!-- Canonical + versiones por idioma (hreflang) --><link rel="canonical" href="https://proyectofenix.team/404/"><link rel="alternate" hreflang="es" href="https://proyectofenix.team/es/"><link rel="alternate" hreflang="en" href="https://proyectofenix.team/"><link rel="alternate" hreflang="x-default" href="https://proyectofenix.team/es/"><!-- View Transitions: morph entre cromo y portada de historia (SPA-like). --><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.CDGfc0hd.js"></script><!-- Open Graph --><meta property="og:type" content="website"><meta property="og:site_name" content="Proyecto Fénix"><meta property="og:title" content="Page not found · Proyecto Fénix"><meta property="og:description" content="We build futures. We tell real stories."><meta property="og:url" content="https://proyectofenix.team/404/"><meta property="og:locale" content="en_US"><!-- Twitter --><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Page not found · Proyecto Fénix"><meta name="twitter:description" content="We build futures. We tell real stories."><meta name="theme-color" content="#050505"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><!-- Sin JS: el contenido revelado por scroll permanece visible. --><noscript><style>
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style></noscript><!-- Tipografía de marca --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"><body> <main class="grid min-h-screen place-items-center overflow-hidden bg-fenix-black px-6 text-center"> <div class="relative"> <div class="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-fenix-gold/[0.08] blur-[130px]"></div> <p class="font-display text-[9rem] leading-none text-fenix-gold sm:text-[12rem]">404</p> <h1 class="mt-4 font-display text-3xl uppercase tracking-tight text-fenix-ivory sm:text-4xl"> Page not found </h1> <p class="mx-auto mt-4 max-w-md text-lg text-fenix-ivory/70">The story you&#39;re looking for doesn&#39;t exist or has moved.</p> <p class="mx-auto mt-1 max-w-md text-sm italic text-fenix-ivory/45"> La historia que buscas no existe o cambió de lugar. </p> <div class="mt-10 flex items-center justify-center"> <a href="/" class="group inline-flex items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-sm font-medium tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fenix-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-fenix-black bg-fenix-gold text-fenix-black hover:bg-fenix-gold-soft hover:shadow-glow-gold"> Back to home </a> </div> </div> </main> </body><link rel="stylesheet" href="/_astro/_slug_.CxBi6n6s.css">
+<style>.astro-route-announcer{position:absolute;left:0;top:0;clip:rect(0 0 0 0);clip-path:inset(50%);overflow:hidden;white-space:nowrap;width:1px;height:1px}
+</style></head></html>
